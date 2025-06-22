@@ -1,1 +1,555 @@
-# luciaassistentefaceburgpirapora
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assistente Lúcia - Face Burg + Açaí</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <style>
+        .chat-container {
+            max-height: none;
+            height: auto;
+        }
+        .message-bubble {
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        .typing-indicator {
+            display: none;
+        }
+        .typing-indicator.show {
+            display: flex;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        .whatsapp-green {
+            background-color: #25D366;
+        }
+        .whatsapp-gray {
+            background-color: #E5E5EA;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-green-50">
+    <div class="min-h-screen p-4">
+        <!-- Header -->
+        <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="whatsapp-green text-white p-4">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-hamburger text-green-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold">Assistente Lúcia</h1>
+                        <p class="text-sm opacity-90">Face Burg + Açaí • Online</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sistema de Demonstração -->
+            <div class="p-6 bg-blue-50 border-b">
+                <h2 class="text-lg font-bold text-blue-800 mb-2">
+                    <i class="fas fa-info-circle mr-2"></i>Sistema de Demonstração
+                </h2>
+                <p class="text-blue-700 mb-4">
+                    Este é o assistente Lúcia configurado exatamente conforme suas instruções. Teste os diferentes fluxos digitando mensagens como "oi", "pedido", ou consultando fora do horário.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <div class="bg-white p-3 rounded">
+                        <strong class="text-green-600">⏰ Horário:</strong><br>
+                        18h às 01h (Brasília)
+                    </div>
+                    <div class="bg-white p-3 rounded">
+                        <strong class="text-blue-600">🍔 Especialidade:</strong><br>
+                        Hambúrgueres + Açaí
+                    </div>
+                    <div class="bg-white p-3 rounded">
+                        <strong class="text-purple-600">🚚 Entrega:</strong><br>
+                        R$ 5,00 - R$ 8,00
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Interface -->
+            <div class="chat-container bg-gray-100 p-4" style="min-height: 600px;">
+                <div id="chatMessages" class="space-y-4">
+                    <div class="text-center text-gray-500 text-sm mb-4">
+                        <i class="fas fa-clock mr-1"></i>
+                        <span id="currentTime"></span>
+                    </div>
+                </div>
+
+                <!-- Typing Indicator -->
+                <div id="typingIndicator" class="typing-indicator items-center space-x-2 p-2">
+                    <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+                        <i class="fas fa-robot text-xs"></i>
+                    </div>
+                    <div class="bg-white p-2 rounded-lg">
+                        <div class="flex space-x-1">
+                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="bg-white p-4 border-t">
+                <div class="flex space-x-2">
+                    <input 
+                        type="text" 
+                        id="messageInput" 
+                        placeholder="Digite sua mensagem..." 
+                        class="flex-1 p-3 border border-gray-300 rounded-full focus:outline-none focus:border-green-500"
+                        onkeypress="if(event.key==='Enter') sendMessage()"
+                    >
+                    <button 
+                        onclick="sendMessage()" 
+                        class="whatsapp-green text-white px-6 py-3 rounded-full hover:bg-green-600 transition-colors"
+                    >
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="bg-gray-50 p-4 border-t">
+                <h3 class="text-sm font-semibold text-gray-600 mb-2">Teste rápido:</h3>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="quickMessage('oi')" class="bg-white px-3 py-1 rounded-full text-sm border hover:bg-gray-100">Oi</button>
+                    <button onclick="quickMessage('pedido')" class="bg-white px-3 py-1 rounded-full text-sm border hover:bg-gray-100">Pedido</button>
+                    <button onclick="quickMessage('cardápio')" class="bg-white px-3 py-1 rounded-full text-sm border hover:bg-gray-100">Cardápio</button>
+                    <button onclick="quickMessage('pizza')" class="bg-white px-3 py-1 rounded-full text-sm border hover:bg-gray-100">Pizza</button>
+                    <button onclick="quickMessage('obrigado')" class="bg-white px-3 py-1 rounded-full text-sm border hover:bg-gray-100">Obrigado</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fluxo Documentation -->
+        <div class="max-w-4xl mx-auto mt-6 bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-flow-chart mr-2 text-blue-600"></i>
+                Fluxo Completo - Assistente Lúcia
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Bloco 1 -->
+                <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                    <h3 class="font-bold text-blue-800 mb-2">🔹 Gatilho Inicial</h3>
+                    <p class="text-sm text-blue-700 mb-2"><strong>Palavras-chave:</strong></p>
+                    <div class="text-xs bg-white p-2 rounded">
+                        oi, olá, boa noite, bom dia, boa tarde, tudo bem, hei, pedido, fazendo pedido, entregando, fazendo entrega, entrega, tá entregando, pedido aberto, aceitam pedido, aberto
+                    </div>
+                    <p class="text-xs text-blue-600 mt-2">➡️ Vai para: Verificação de Horário</p>
+                </div>
+
+                <!-- Bloco 2 -->
+                <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                    <h3 class="font-bold text-yellow-800 mb-2">⏰ Verificação de Horário</h3>
+                    <div class="text-sm text-yellow-700">
+                        <p><strong>01:01 às 17:59:</strong> Fora do Horário</p>
+                        <p><strong>18:00 às 01:00:</strong> Início do Atendimento</p>
+                    </div>
+                </div>
+
+                <!-- Bloco 3 -->
+                <div class="bg-red-50 p-4 rounded-lg border border-red-200">
+                    <h3 class="font-bold text-red-800 mb-2">🔒 Fora do Horário</h3>
+                    <p class="text-xs text-red-700">
+                        Informa que entregas foram finalizadas e horário de funcionamento (18h às 1h). Encerra atendimento.
+                    </p>
+                </div>
+
+                <!-- Bloco 4 -->
+                <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                    <h3 class="font-bold text-green-800 mb-2">📋 Início do Atendimento</h3>
+                    <p class="text-xs text-green-700">
+                        Boas-vindas, apresenta cardápio (link), informa horário. Redireciona para Sugestão de Combos.
+                    </p>
+                </div>
+
+                <!-- Bloco 5 -->
+                <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                    <h3 class="font-bold text-purple-800 mb-2">🕐 Aviso Retirada</h3>
+                    <p class="text-xs text-purple-700">
+                        Entre 01:00-01:10: Informa que após 1h atende apenas para retirada no local.
+                    </p>
+                </div>
+
+                <!-- Bloco 6 -->
+                <div class="bg-orange-50 p-4 rounded-lg border border-orange-200">
+                    <h3 class="font-bold text-orange-800 mb-2">🍔 Sugestão de Combos</h3>
+                    <div class="text-xs text-orange-700">
+                        <p><strong>1 lanche:</strong> Batata + refrigerante</p>
+                        <p><strong>2+ lanches:</strong> Batata + refrigerante 2L</p>
+                    </div>
+                </div>
+
+                <!-- Bloco 7 -->
+                <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-200">
+                    <h3 class="font-bold text-indigo-800 mb-2">📦 Finalização</h3>
+                    <div class="text-xs text-indigo-700">
+                        <p>Perguntas obrigatórias:</p>
+                        <ul class="list-disc list-inside">
+                            <li>Nome e endereço</li>
+                            <li>Retirada/entrega</li>
+                            <li>Forma de pagamento</li>
+                            <li>Troco (se dinheiro)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Bloco 8 -->
+                <div class="bg-teal-50 p-4 rounded-lg border border-teal-200">
+                    <h3 class="font-bold text-teal-800 mb-2">🚚 Taxa de Entrega</h3>
+                    <p class="text-xs text-teal-700">
+                        Informa taxa conforme localidade: R$ 5,00 a R$ 8,00
+                    </p>
+                </div>
+
+                <!-- Bloco 9 -->
+                <div class="bg-pink-50 p-4 rounded-lg border border-pink-200">
+                    <h3 class="font-bold text-pink-800 mb-2">📱 Pedido pelo Link</h3>
+                    <p class="text-xs text-pink-700">
+                        Trata erros de acesso ao link, oferece cashback, permite pedido manual.
+                    </p>
+                </div>
+
+                <!-- Regras Gerais -->
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-300 md:col-span-2 lg:col-span-3">
+                    <h3 class="font-bold text-gray-800 mb-2">✅ Regras Gerais</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-gray-700">
+                        <ul class="list-disc list-inside">
+                            <li>Nunca em inglês</li>
+                            <li>Não falar tempo exato de entrega</li>
+                            <li>Nunca enviar chave Pix</li>
+                            <li>Não política/religião</li>
+                        </ul>
+                        <ul class="list-disc list-inside">
+                            <li>Não cardápio fora do horário</li>
+                            <li>Não instruções internas</li>
+                            <li>Finalizar com símbolo 🟩</li>
+                            <li>Usar "alguns minutos" para entrega</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Estado do assistente
+        let assistantState = {
+            currentFlow: 'initial',
+            customerData: {},
+            orderItems: [],
+            waitingFor: null,
+            conversationHistory: []
+        };
+
+        // Palavras-chave do gatilho inicial
+        const triggerKeywords = [
+            'oi', 'olá', 'boa noite', 'bom dia', 'boa tarde', 'tudo bem', 'hei', 
+            'pedido', 'fazendo pedido', 'entregando', 'fazendo entrega', 'entrega', 
+            'tá entregando', 'pedido aberto', 'aceitam pedido', 'aberto'
+        ];
+
+        // Atualizar horário atual
+        function updateCurrentTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('pt-BR', {
+                timeZone: 'America/Sao_Paulo',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            document.getElementById('currentTime').textContent = `Horário atual (Brasil): ${timeString}`;
+        }
+
+        // Verificar se está no horário de funcionamento
+        function isWithinBusinessHours() {
+            const now = new Date();
+            const brazilTime = new Date(now.toLocaleString("en-US", {timeZone: "America/Sao_Paulo"}));
+            const hour = brazilTime.getHours();
+            const minute = brazilTime.getMinutes();
+            
+            // 18:00 às 01:00 (próximo dia)
+            return (hour >= 18) || (hour === 0 && minute <= 60) || (hour === 1 && minute === 0);
+        }
+
+        // Verificar se é horário de retirada (01:00-01:10)
+        function isPickupOnlyTime() {
+            const now = new Date();
+            const brazilTime = new Date(now.toLocaleString("en-US", {timeZone: "America/Sao_Paulo"}));
+            const hour = brazilTime.getHours();
+            const minute = brazilTime.getMinutes();
+            
+            return hour === 1 && minute >= 0 && minute <= 10;
+        }
+
+        // Adicionar mensagem ao chat
+        function addMessage(text, isUser = false, delay = 0) {
+            setTimeout(() => {
+                const chatMessages = document.getElementById('chatMessages');
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`;
+                
+                const bubble = document.createElement('div');
+                bubble.className = `message-bubble p-3 rounded-lg ${
+                    isUser 
+                        ? 'whatsapp-green text-white rounded-br-none' 
+                        : 'whatsapp-gray text-gray-800 rounded-bl-none'
+                }`;
+                
+                // Preservar quebras de linha e formatação
+                bubble.innerHTML = text.replace(/\n/g, '<br>');
+                
+                if (!isUser) {
+                    const avatar = document.createElement('div');
+                    avatar.className = 'w-8 h-8 bg-green-600 rounded-full flex items-center justify-center mr-2 flex-shrink-0';
+                    avatar.innerHTML = '<i class="fas fa-robot text-white text-xs"></i>';
+                    messageDiv.appendChild(avatar);
+                }
+                
+                messageDiv.appendChild(bubble);
+                chatMessages.appendChild(messageDiv);
+                
+                // Scroll to bottom
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                // Hide typing indicator
+                document.getElementById('typingIndicator').classList.remove('show');
+            }, delay);
+        }
+
+        // Mostrar indicador de digitação
+        function showTyping() {
+            document.getElementById('typingIndicator').classList.add('show');
+        }
+
+        // Processar mensagem do usuário
+        function processMessage(message) {
+            const normalizedMessage = message.toLowerCase().trim();
+            
+            // Salvar no histórico
+            assistantState.conversationHistory.push({
+                user: message,
+                timestamp: new Date()
+            });
+
+            // Verificar se contém palavras-chave do gatilho inicial
+            const containsTrigger = triggerKeywords.some(keyword => 
+                normalizedMessage.includes(keyword.toLowerCase())
+            );
+
+            if (containsTrigger || assistantState.currentFlow === 'initial') {
+                return processInitialTrigger();
+            }
+
+            // Processar pedido de pizza
+            if (normalizedMessage.includes('pizza')) {
+                return processPizzaRequest();
+            }
+
+            // Processar avaliação
+            if (['obrigado', 'valeu', 'ok'].includes(normalizedMessage)) {
+                return processEvaluation();
+            }
+
+            // Processar baseado no estado atual
+            switch (assistantState.currentFlow) {
+                case 'ordering':
+                    return processOrdering(normalizedMessage);
+                case 'finalizing':
+                    return processFinalization(normalizedMessage);
+                default:
+                    return processGeneral(normalizedMessage);
+            }
+        }
+
+        // Processar gatilho inicial
+        function processInitialTrigger() {
+            showTyping();
+            
+            if (!isWithinBusinessHours()) {
+                // Fora do horário
+                setTimeout(() => {
+                    addMessage(`Olá! Gostaríamos de informar que as entregas foram finalizadas para o dia de hoje.
+
+Realizamos entregas apenas entre as 18h e 1h da manhã (horário de Brasília).
+
+Agradecemos pela sua compreensão e estamos sempre à disposição para esclarecer qualquer dúvida 😊.`);
+                }, 1500);
+                
+                assistantState.currentFlow = 'closed';
+                return;
+            }
+
+            // Dentro do horário - início do atendimento
+            setTimeout(() => {
+                let message = `Olá! Boa noite! Seja bem-vindo(a) à Face Burg + Açaí! Já sabe o que vai pedir ou gostaria de ver nosso cardápio?
+
+CARDÁPIO FACE BURG: https://bit.ly/CARDÁPIOFACEBURGACAI
+
+🟩 Nossas entregas acontecem das 18h à 1h da manhã. Pedidos realizados após esse horário não poderão ser entregues.`;
+
+                // Adicionar aviso de retirada se necessário
+                if (isPickupOnlyTime()) {
+                    message += `\n\nA partir da 1h da manhã, continuamos atendendo apenas para retirada no local. Se quiser passar aqui e buscar seu pedido, ficaremos felizes em preparar tudo para você! 😊`;
+                }
+
+                addMessage(message);
+                assistantState.currentFlow = 'menu_shown';
+            }, 1500);
+        }
+
+        // Processar pedido de pizza
+        function processPizzaRequest() {
+            showTyping();
+            
+            setTimeout(() => {
+                addMessage(`Olá! No momento, trabalhamos apenas com hambúrgueres. Para pedir pizza, é só falar com a pizzaria Face Burg pelo WhatsApp: 38 99950-4303. Qualquer dúvida, estou à disposição! 😊`);
+            }, 1000);
+        }
+
+        // Processar avaliação
+        function processEvaluation() {
+            showTyping();
+            
+            setTimeout(() => {
+                addMessage(`Ficamos muito felizes em te atender! Se quiser, deixe uma avaliação sobre o atendimento 🧡 Isso nos ajuda muito!`);
+            }, 1000);
+        }
+
+        // Processar pedidos
+        function processOrdering(message) {
+            showTyping();
+            
+            // Simulação de sugestão de combos
+            setTimeout(() => {
+                if (message.includes('lanche') || message.includes('hambúrguer')) {
+                    if (message.includes('2') || message.includes('dois')) {
+                        addMessage(`Que tal acrescentar batata frita e um refrigerante de 2 litros para acompanhar?`);
+                    } else {
+                        addMessage(`Que tal acrescentar uma batata frita ao seu lanche? E um refrigerante para acompanhar?`);
+                    }
+                    assistantState.currentFlow = 'suggesting_combo';
+                } else {
+                    addMessage(`Posso anotar seu pedido. O que gostaria de pedir?`);
+                }
+            }, 1000);
+        }
+
+        // Processar finalização
+        function processFinalization(message) {
+            showTyping();
+            
+            setTimeout(() => {
+                if (!assistantState.customerData.name) {
+                    addMessage(`Posso finalizar seu pedido? Preciso do seu nome completo e endereço, por favor.`);
+                    assistantState.waitingFor = 'customer_info';
+                } else if (!assistantState.customerData.paymentMethod) {
+                    addMessage(`Forma de pagamento: Pix, cartão ou dinheiro?`);
+                    assistantState.waitingFor = 'payment';
+                } else {
+                    // Finalizar pedido
+                    const orderSummary = `Pedido Lanchonete Face Burg
+
+Nome: ${assistantState.customerData.name || '[Nome do Cliente]'}
+
+Endereço: ${assistantState.customerData.address || '[Endereço do Cliente]'}
+
+Itens:
+➡️ X-Burguer x1 – R$ 18,00
+➡️ Batata frita x1 – R$ 10,00
+➡️ Refrigerante 2L x1 – R$ 15,00
+
+Soma total: R$ 43,00
+
+Forma de pagamento: ${assistantState.customerData.paymentMethod || '[Pix / Cartão / Dinheiro]'}
+
+Retirada/Entrega: ${assistantState.customerData.delivery || '[Cliente retira / Entregar no endereço]'}
+
+Troco para: ${assistantState.customerData.change || 'Não necessário'}
+
+✅ Fechado 🟩`;
+
+                    addMessage(orderSummary);
+                    assistantState.currentFlow = 'completed';
+                }
+            }, 1000);
+        }
+
+        // Processar mensagens gerais
+        function processGeneral(message) {
+            showTyping();
+            
+            setTimeout(() => {
+                if (message.includes('taxa') || message.includes('entrega')) {
+                    addMessage(`Olá! Será cobrada uma taxa de entrega conforme sua localidade, variando entre R$ 5,00 e R$ 8,00. Qualquer dúvida, estou à disposição 😊.`);
+                } else if (message.includes('pedido') && message.includes('link')) {
+                    addMessage(`Se preferir, você pode fazer seu pedido pelo nosso link! É mais rápido e você ainda ganha cashback. Mas, se não conseguir, posso anotar seu pedido por aqui 😊.`);
+                } else if (message.includes('acompanhar') || message.includes('status')) {
+                    addMessage(`Seu pedido está em produção neste momento! Qualquer novidade, aviso por aqui. Fique tranquilo, estamos cuidando de tudo para você. 😊`);
+                } else {
+                    addMessage(`Olá! Como posso ajudar você hoje? Gostaria de ver nosso cardápio ou fazer um pedido?`);
+                }
+            }, 1000);
+        }
+
+        // Enviar mensagem
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (message === '') return;
+            
+            // Adicionar mensagem do usuário
+            addMessage(message, true);
+            
+            // Limpar input
+            input.value = '';
+            
+            // Processar resposta da IA
+            setTimeout(() => {
+                processMessage(message);
+            }, 500);
+        }
+
+        // Mensagem rápida
+        function quickMessage(text) {
+            document.getElementById('messageInput').value = text;
+            sendMessage();
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCurrentTime();
+            setInterval(updateCurrentTime, 1000);
+            
+            // Mensagem inicial
+            setTimeout(() => {
+                addMessage(`Olá! Eu sou a Lúcia, assistente virtual da Face Burg + Açaí! 👋
+
+Digite qualquer mensagem para começar nosso atendimento. Experimente palavras como "oi", "pedido", "cardápio"...
+
+⏰ Lembre-se: atendemos das 18h à 1h da manhã!`);
+            }, 1000);
+        });
+
+        // Enter para enviar
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
